@@ -1,0 +1,9 @@
+[submodule "r-instrumented"]
+	path = r-instrumented
+	url = https://github.com/allr/r-instrumented.git
+[submodule "timeR"]
+	path = timeR
+	url = https://github.com/allr/timeR.git
+[submodule "traceR"]
+	path = traceR
+	url = https://github.com/allr/tracer.git
