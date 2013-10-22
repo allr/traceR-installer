@@ -19,7 +19,7 @@ endif
 TRACER_JAR=tracer-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 
 # default target
-real-all: install-timer install-instrumented install-tracer
+real-all: check-path install-timer install-instrumented install-tracer
 	@echo "=== all done! ==="
 
 #
@@ -127,9 +127,15 @@ help:
 	@echo "Please clone the traceR-install repository and try again."
 	@false
 
-# FIXME: Add
+# run "make clean" in the subrepositories
 clean:
-	@echo Sorry, the \"clean\" target is currently not supported.
+	$(E) ===== cleaning timeR =====
+	$(Q)cd timeR ; $(MAKE) clean
+	$(E) ===== cleaning r-instrumented =====
+	$(Q)cd r-instrumented ; $(MAKE) clean
+	$(Q)rm -f .old_installprefix
+# no clean target supported for traceR
+
 
 # create target directory
 $(REALPREFIX):
@@ -150,3 +156,27 @@ timeR/.git/% r-instrumented/.git/% traceR/.git/%: .git/% .git/FETCH_HEAD .git/re
 # helper target for the maintainer
 updateall:
 	git submodule foreach git pull origin master
+
+# check for change of target prefix
+-include .old_installprefix
+
+.PHONY : check-path
+check-path:
+	$(Q)echo OLD_PREFIX=$(REALPREFIX) > .old_installprefix
+
+# conditionally add a dependency if OLD_PREFIX does not exist or differs
+ifndef OLD_PREFIX
+check-path: touch-heads
+else
+  ifeq ($(OLD_PREFIX), $(REALPREFIX))
+check-path:
+  else
+check-path: touch-heads
+  endif
+endif
+
+.PHONY : touch-heads
+touch-heads:
+	$(Q)touch traceR/.git/HEAD
+	$(Q)touch timeR/.git/HEAD
+	$(Q)touch r-instrumented/.git/HEAD
