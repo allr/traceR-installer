@@ -1,7 +1,9 @@
 ifdef PREFIX
+all: | .git
 all: real-all
 REALPREFIX := $(abspath $(PREFIX))
 else
+all: | .git
 all: error
 endif
 
@@ -92,7 +94,7 @@ r-instrumented/bin/R: r-instrumented/.git/HEAD | $(REALPREFIX)
 error:
 	@echo ERROR: No target directory has been specified!
 	@echo ""
-	@echo Please use \"$(MAKE) REALPREFIX=/where/you/want/it/installed\"
+	@echo Please use \"$(MAKE) PREFIX=/where/you/want/it/installed\"
 	@echo to specify a target directory.
 	@echo ""
 	@echo You can also use \"make help\" to see a list of
@@ -114,6 +116,16 @@ help:
 	@echo "  INSTRUMENTED_CONFIGOPTS"
 	@echo "    sets the options passed to configure for just r-instrumented"
 
+
+# sanity check
+.git:
+	@echo "ERROR: No .git directory found"
+	@echo ""
+	@echo "This Makefile only works if you use a clone of the traceR-install"
+	@echo "repository and not if you just have an archive of its contents."
+	@echo ""
+	@echo "Please clone the traceR-install repository and try again."
+	@false
 
 # FIXME: Add
 clean:
