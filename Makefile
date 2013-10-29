@@ -32,15 +32,24 @@ build-tracer: traceR/$(TRACER_JAR)
 install-tracer: $(REALPREFIX)/tracer.jar
 
 $(REALPREFIX)/tracer.jar: traceR/$(TRACER_JAR) | $(REALPREFIX)
+# FIXME: Move this to a Makefile in traceR
 	$(E) ===== installing traceR =====
 # traceR itself
 	$(Q)cp $< $@
+	$(Q)cp traceR/tracer.sh $(REALPREFIX)/tracer.sh
 # sample queries
 	$(Q)mkdir -p $(REALPREFIX)/queries
 	$(Q)cp traceR/queries/* $(REALPREFIX)/queries
-# shell script
-	$(Q)sed '/^BASEDIR=/ s!=.*!=$(REALPREFIX)!' traceR/tracer.sh > $(REALPREFIX)/tracer.sh
-	$(Q)chmod +x $(REALPREFIX)/tracer.sh
+# sample programs
+	$(Q)mkdir -p $(REALPREFIX)/demos
+	$(Q)cp traceR/demos/* $(REALPREFIX)/demos
+# scripts
+	$(Q)mkdir -p $(REALPREFIX)/scripts
+	$(Q)cp traceR/scripts/* $(REALPREFIX)/scripts
+# fix path in shell scripts
+	$(Q)./fixpath.sh $(REALPREFIX)/tracer.sh $(REALPREFIX)
+	$(Q)./fixpath.sh $(REALPREFIX)/demos/rundemos.sh $(REALPREFIX)
+	$(Q)./fixpath.sh $(REALPREFIX)/scripts/plotall.sh $(REALPREFIX)
 
 traceR/$(TRACER_JAR): traceR/.git/HEAD
 	$(E) ===== building traceR =====

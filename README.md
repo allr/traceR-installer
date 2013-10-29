@@ -15,4 +15,7 @@ If you update this repository (using git pull), a new invocation of
 "make PREFIX=..." should rebuild everything as needed.
 Please be aware that the Makefile is currently considered to be
 "experimental", so it may not work correctly in every situation and it
-may rebuild more than strictly necessary.
+may rebuild more than strictly necessary. If in doubt, try "make clean"
+before building; if there are still issues try a fresh checkout of
+traceR-installer in a new directory.
+
