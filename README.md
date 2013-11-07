@@ -19,3 +19,8 @@ may rebuild more than strictly necessary. If in doubt, try "make clean"
 before building; if there are still issues try a fresh checkout of
 traceR-installer in a new directory.
 
+More details about the installed programs can be found in their
+respective subdirectories. If you just want a very quick
+demonstration, run "demos/rundemos.sh" from the installation
+directory, wait until it has completed and then check the "plots"
+subdirectory.

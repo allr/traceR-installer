@@ -16,8 +16,6 @@ else
  E := @echo
 endif
 
-TRACER_JAR=tracer-0.0.1-SNAPSHOT-jar-with-dependencies.jar
-
 # default target
 real-all: check-path install-timer install-instrumented install-tracer
 	@echo "=== all done! ==="
@@ -27,33 +25,18 @@ real-all: check-path install-timer install-instrumented install-tracer
 #
 .PHONY : build-tracer install-tracer
 
-build-tracer: traceR/$(TRACER_JAR)
+build-tracer: traceR/tracer.jar
 
 install-tracer: $(REALPREFIX)/tracer.jar
 
-$(REALPREFIX)/tracer.jar: traceR/$(TRACER_JAR) | $(REALPREFIX)
+$(REALPREFIX)/tracer.jar: traceR/tracer.jar | $(REALPREFIX)
 # FIXME: Move this to a Makefile in traceR
 	$(E) ===== installing traceR =====
-# traceR itself
-	$(Q)cp $< $@
-	$(Q)cp traceR/tracer.sh $(REALPREFIX)/tracer.sh
-# sample queries
-	$(Q)mkdir -p $(REALPREFIX)/queries
-	$(Q)cp traceR/queries/* $(REALPREFIX)/queries
-# sample programs
-	$(Q)mkdir -p $(REALPREFIX)/demos
-	$(Q)cp traceR/demos/* $(REALPREFIX)/demos
-# scripts
-	$(Q)mkdir -p $(REALPREFIX)/scripts
-	$(Q)cp traceR/scripts/* $(REALPREFIX)/scripts
-# fix path in shell scripts
-	$(Q)./fixpath.sh $(REALPREFIX)/tracer.sh $(REALPREFIX)
-	$(Q)./fixpath.sh $(REALPREFIX)/demos/rundemos.sh $(REALPREFIX)
-	$(Q)./fixpath.sh $(REALPREFIX)/scripts/plotall.sh $(REALPREFIX)
+	$(Q)cd traceR ; $(MAKE) install PREFIX=$(REALPREFIX)
 
-traceR/$(TRACER_JAR): traceR/.git/HEAD
+traceR/tracer.jar: traceR/.git/HEAD
 	$(E) ===== building traceR =====
-	$(Q)cd traceR ; ./build.sh
+	$(Q)cd traceR ; $(MAKE)
 
 
 #
@@ -99,7 +82,7 @@ r-instrumented/bin/R: r-instrumented/.git/HEAD | $(REALPREFIX)
 # other rules
 #
 
-# error message if no REALPREFIX is specified
+# error message if no REFIX is specified
 error:
 	@echo ERROR: No target directory has been specified!
 	@echo ""
