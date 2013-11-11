@@ -168,7 +168,7 @@ check-path: touch-heads
 endif
 
 .PHONY : touch-heads
-touch-heads:
+touch-heads: traceR/.git/HEAD timeR/.git/HEAD r-instrumented/.git/HEAD
 	$(Q)touch traceR/.git/HEAD
 	$(Q)touch timeR/.git/HEAD
 	$(Q)touch r-instrumented/.git/HEAD
