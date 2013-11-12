@@ -17,7 +17,7 @@ else
 endif
 
 # default target
-real-all: check-path install-timer install-instrumented install-tracer
+real-all: install-timer install-instrumented install-tracer
 	@echo "=== all done! ==="
 
 #
@@ -34,7 +34,7 @@ $(REALPREFIX)/tracer.jar: traceR/tracer.jar | $(REALPREFIX)
 	$(E) ===== installing traceR =====
 	$(Q)cd traceR ; $(MAKE) install PREFIX=$(REALPREFIX)
 
-traceR/tracer.jar: traceR/.git/HEAD
+traceR/tracer.jar: .last-modupdate
 	$(E) ===== building traceR =====
 	$(Q)cd traceR ; $(MAKE)
 
@@ -52,7 +52,7 @@ $(REALPREFIX)/timed/bin/R: timeR/bin/R | $(REALPREFIX)
 	$(E) ===== installing timeR =====
 	$(Q)cd timeR ; $(MAKE) install
 
-timeR/bin/R: timeR/.git/HEAD
+timeR/bin/R: .last-modupdate .old_installprefix | $(REALPREFIX)
 	$(E) ===== building timeR =====
 	$(Q)cd timeR ; ./configure --prefix=$(REALPREFIX)/timed --enable-timeR $(COMMON_CONFIGOPTS) $(TIMER_CONFIGOPTS)
 	$(Q)cd timeR ; $(MAKE) $(MAKEOPTS)
@@ -71,7 +71,7 @@ $(REALPREFIX)/instrumented/bin/R: r-instrumented/bin/R | $(REALPREFIX)
 	$(E) ===== installing r-instrumented =====
 	$(Q)cd r-instrumented ; $(MAKE) install
 
-r-instrumented/bin/R: r-instrumented/.git/HEAD | $(REALPREFIX)
+r-instrumented/bin/R: .last-modupdate .old_installprefix | $(REALPREFIX)
 	$(E) ===== building r-instrumented =====
 	$(Q)cd r-instrumented ; ./configure --prefix=$(REALPREFIX)/instrumented $(COMMON_CONFIGOPTS) $(INSTRUMENTED_CONFIGOPTS)
 	$(Q)cd r-instrumented ; $(MAKE) $(MAKEOPTS)
@@ -125,25 +125,23 @@ clean:
 	$(Q)cd timeR ; $(MAKE) clean
 	$(E) ===== cleaning r-instrumented =====
 	$(Q)cd r-instrumented ; $(MAKE) clean
-	$(Q)rm -f .old_installprefix
-# no clean target supported for traceR
+	$(E) ===== cleaning traceR =====
+	$(Q)cd traceR ; $(MAKE) clean
+	$(Q)rm -f .old_installprefix .last-modupdate
 
 
 # create target directory
 $(REALPREFIX):
 	$(Q)mkdir -p $(REALPREFIX)
 
-# Note: This is a pattern rule because GNU make would split it
-#       into multiple single-target rules otherwise
-timeR/.git/% r-instrumented/.git/% traceR/.git/%: .git/% .git/FETCH_HEAD .git/refs/heads/master
-	@echo ===== Updating submodules =====
-	@git submodule update --init
-	@touch $@
+.last-modupdate: .git/HEAD .git/FETCH_HEAD .git/refs/heads/master
+	$(Q)git submodule update --init
+	$(Q)touch $@
 
 # Workaround for freshly-cloned repos that don't have this file yet
 .git/FETCH_HEAD:
 #	@git fetch   would work too, but fails if there are no remotes
-	@touch $@
+	$(Q)touch $@
 
 # helper target for the maintainer
 updateall:
@@ -152,23 +150,20 @@ updateall:
 # check for change of target prefix
 -include .old_installprefix
 
-.PHONY : check-path
-check-path:
+.old_installprefix:
 	$(Q)echo OLD_PREFIX=$(REALPREFIX) > .old_installprefix
 
-# conditionally add a dependency if OLD_PREFIX does not exist or differs
+# conditionally add a force-rebuild dependency if OLD_PREFIX does not exist or differs
 ifndef OLD_PREFIX
-check-path: touch-heads
+.old_installprefix: FORCE
 else
   ifeq ($(OLD_PREFIX), $(REALPREFIX))
-check-path:
+.old_installprefix:
   else
-check-path: touch-heads
+.old_installprefix: FORCE
   endif
 endif
 
-.PHONY : touch-heads
-touch-heads: traceR/.git/HEAD timeR/.git/HEAD r-instrumented/.git/HEAD
-	$(Q)touch traceR/.git/HEAD
-	$(Q)touch timeR/.git/HEAD
-	$(Q)touch r-instrumented/.git/HEAD
+# empty no-rule target for forcing other targets to always rebuild
+.PHONE : FORCE
+FORCE:
