@@ -150,8 +150,12 @@ updateall:
 # check for change of target prefix
 -include .old_installprefix
 
+ifdef PREFIX
 .old_installprefix:
 	$(Q)echo OLD_PREFIX=$(REALPREFIX) > .old_installprefix
+else
+.old_installprefix:
+endif
 
 # conditionally add a force-rebuild dependency if OLD_PREFIX does not exist or differs
 ifndef OLD_PREFIX
