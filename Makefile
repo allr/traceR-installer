@@ -23,20 +23,13 @@ real-all: install-timer install-instrumented install-tracer
 #
 # traceR
 #
-.PHONY : build-tracer install-tracer
+.PHONY : install-tracer
 
-build-tracer: traceR/tracer.jar
+install-tracer: $(REALPREFIX)/tracer.pl
 
-install-tracer: $(REALPREFIX)/tracer.jar
-
-$(REALPREFIX)/tracer.jar: traceR/tracer.jar | $(REALPREFIX)
-# FIXME: Move this to a Makefile in traceR
+$(REALPREFIX)/tracer.pl: traceR/tracer.pl | $(REALPREFIX)
 	$(E) ===== installing traceR =====
 	$(Q)cd traceR ; $(MAKE) install PREFIX=$(REALPREFIX)
-
-traceR/tracer.jar: .last-modupdate
-	$(E) ===== building traceR =====
-	$(Q)cd traceR ; $(MAKE)
 
 
 #
