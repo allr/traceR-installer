@@ -1,10 +1,10 @@
 ifdef PREFIX
-all: | .git
-all: real-all
+install all: | .git
+install all: real-all
 REALPREFIX := $(abspath $(PREFIX))
 else
-all: | .git
-all: error
+install all: | .git
+install all: error
 endif
 
 # Enable verbose compilation with "make V=1"
