@@ -66,7 +66,7 @@ $(REALPREFIX)/instrumented/bin/R: r-instrumented/bin/R | $(REALPREFIX)
 
 r-instrumented/bin/R: .last-modupdate .old_installprefix | $(REALPREFIX)
 	$(E) ===== building r-instrumented =====
-	$(Q)cd r-instrumented ; ./configure --prefix=$(REALPREFIX)/instrumented $(COMMON_CONFIGOPTS) $(INSTRUMENTED_CONFIGOPTS)
+	$(Q)cd r-instrumented ; ./configure --prefix=$(REALPREFIX)/instrumented --disable-debugscopes $(COMMON_CONFIGOPTS) $(INSTRUMENTED_CONFIGOPTS)
 	$(Q)cd r-instrumented ; $(MAKE) $(MAKEOPTS)
 	$(Q)touch $@
 
